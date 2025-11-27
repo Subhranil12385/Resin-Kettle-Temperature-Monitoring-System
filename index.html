@@ -574,7 +574,7 @@
         </div>
 
         <div class="controls-card">
-            <h2>📅 Data Selection</h2>
+            <h2>📅 Date and Time Selection</h2>
             <div class="date-controls">
                 <div class="control-group">
                     <label for="startDate">Start Date</label>
@@ -648,9 +648,9 @@
             
             <div class="dual-duration-container">
                 <div class="duration-measurement">
-                    <h3>⏱️ Click Duration Measurement 1</h3>
+                    <h3>⏱️ Duration Measurement 1</h3>
                     <div class="duration-instruction">
-                        Click on the chart to select two points and measure the time duration between them.
+                        Click on the chart to select two points to measure the time duration between them.
                     </div>
                     <div class="duration-result">
                         <div class="duration-item">
@@ -711,18 +711,18 @@
                     <select id="resinType" onchange="toggleOthersInput('resinOthers')">
                         <option value="MF">MF</option>
                         <option value="PF">PF</option>
-                        <option value="UF">UF</option>
+                        <option value="UF">UMF</option>
                         <option value="Others">Others, Please specify</option>
                     </select>
                     <input type="text" id="resinOthers" class="others-input" placeholder="Specify resin type">
                 </div>
                 <div class="form-group">
-                    <label for="batchNo">B.NO</label>
+                    <label for="batchNo">Batch No.</label>
                     <input type="text" id="batchNo" placeholder="e.g., 36">
                 </div>
                 <div class="form-group">
                     <label for="preparedBy">Prepared By</label>
-                    <input type="text" id="preparedBy" placeholder="e.g., Mr.ROMAN">
+                    <input type="text" id="preparedBy" placeholder="e.g., Mr.XYZ">
                 </div>
                 <div class="form-group">
                     <label for="batchQuality">Batch Quality</label>
@@ -1444,12 +1444,12 @@
             
             // Draw report header
             ctx.fillStyle = 'black';
-            ctx.font = 'bold 24px Arial';
+            ctx.font = 'bold 30px Arial';
             ctx.textAlign = 'center';
             ctx.fillText(graphTitle, tempCanvas.width / 2, 30);
             
             // Draw report details
-            ctx.font = '16px Arial';
+            ctx.font = '20px Arial';
             ctx.textAlign = 'left';
             let yPosition = 70;
             ctx.fillText(`Kettle No: ${kettleNo}`, 50, yPosition);
