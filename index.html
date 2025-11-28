@@ -1541,9 +1541,27 @@
             const tempCanvas = document.createElement('canvas');
             const ctx = tempCanvas.getContext('2d');
             
-            // Set canvas dimensions - make it taller to fit all content
+            // Calculate dynamic height based on content
+            const baseHeight = chartCanvas.height;
+            let additionalHeight = 300; // Base space for header and table
+            
+            // Add space for comments
+            if (reportComment) {
+                const commentLines = Math.ceil(reportComment.length / 80); // Approximate lines
+                additionalHeight += commentLines * 20 + 40;
+            }
+            
+            // Add space for duration measurements
+            if (startTimeMeasure1 !== '--' && endTimeMeasure1 !== '--') {
+                additionalHeight += 100;
+            }
+            if (startTimeMeasure2 !== '--' && endTimeMeasure2 !== '--') {
+                additionalHeight += 100;
+            }
+            
+            // Set canvas dimensions - dynamic height
             tempCanvas.width = chartCanvas.width;
-            tempCanvas.height = chartCanvas.height + 700; // Extra space for report and multiple durations
+            tempCanvas.height = baseHeight + additionalHeight;
             
             // Draw white background
             ctx.fillStyle = 'white';
@@ -1551,68 +1569,117 @@
             
             // Draw report header
             ctx.fillStyle = 'black';
-            ctx.font = 'bold 24px Arial';
+            ctx.font = 'bold 32px Arial';
             ctx.textAlign = 'center';
             ctx.fillText(graphTitle, tempCanvas.width / 2, 30);
             
-            // Draw report details
-            ctx.font = '16px Arial';
-            ctx.textAlign = 'left';
+            // Draw report details in tabular form with proper grid lines
+            const tableData = [
+                { label: 'Kettle No', value: kettleNo },
+                { label: 'Date', value: new Date().toLocaleDateString() },
+                { label: 'Resin', value: finalResinType },
+                { label: 'Batch No', value: batchNo },
+                { label: 'Prepared By', value: preparedBy },
+                { label: 'Batch Quality', value: finalBatchQuality }
+            ];
+            
+            // Draw table with proper grid lines
             let yPosition = 70;
-            ctx.fillText(`Kettle No: ${kettleNo}`, 50, yPosition);
-            yPosition += 30;
-            ctx.fillText(`Date: ${new Date().toLocaleDateString()}`, 50, yPosition);
-            yPosition += 30;
-            ctx.fillText(`Resin: ${finalResinType}`, 50, yPosition);
-            yPosition += 30;
-            ctx.fillText(`B.NO: ${batchNo}`, 50, yPosition);
-            yPosition += 30;
-            ctx.fillText(`Prepared By: ${preparedBy}`, 50, yPosition);
-            yPosition += 30;
-            ctx.fillText(`Batch Quality: ${finalBatchQuality}`, 50, yPosition);
+            const rowHeight = 35;
+            const tableWidth = tempCanvas.width - 100;
+            const tableX = 50;
+            const labelColWidth = tableWidth * 0.4;
+            const valueColWidth = tableWidth * 0.6;
+            
+            // Draw table headers with background
+            ctx.fillStyle = '#f2f2f2';
+            ctx.fillRect(tableX, yPosition, tableWidth, rowHeight);
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(tableX, yPosition, tableWidth, rowHeight);
+            
+            ctx.fillStyle = 'black';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('Parameter', tableX + 10, yPosition + 25);
+            ctx.fillText('Value', tableX + labelColWidth + 10, yPosition + 25);
+            
+            // Draw vertical line between columns
+            ctx.beginPath();
+            ctx.moveTo(tableX + labelColWidth, yPosition);
+            ctx.lineTo(tableX + labelColWidth, yPosition + (rowHeight * (tableData.length + 1)));
+            ctx.stroke();
+            
+            yPosition += rowHeight;
+            
+            // Draw table rows with alternating background and grid lines
+            ctx.font = '18px Arial';
+            for (let i = 0; i < tableData.length; i++) {
+                const row = tableData[i];
+                
+                // Alternate row background
+                if (i % 2 === 0) {
+                    ctx.fillStyle = 'white';
+                } else {
+                    ctx.fillStyle = '#f9f9f9';
+                }
+                ctx.fillRect(tableX, yPosition, tableWidth, rowHeight);
+                
+                // Draw cell borders
+                ctx.strokeStyle = '#ddd';
+                ctx.strokeRect(tableX, yPosition, tableWidth, rowHeight);
+                
+                // Draw text
+                ctx.fillStyle = 'black';
+                ctx.fillText(row.label, tableX + 10, yPosition + 25);
+                ctx.fillText(row.value, tableX + labelColWidth + 10, yPosition + 25);
+                
+                yPosition += rowHeight;
+            }
             
             // Draw comment if available
             if (reportComment) {
-                yPosition += 40;
-                ctx.font = 'bold 18px Arial';
-                ctx.fillText('Comments:', 50, yPosition);
                 yPosition += 30;
+                ctx.fillStyle = 'black';
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText('Comments:', 50, yPosition);
+                yPosition += 25;
                 ctx.font = '16px Arial';
                 
                 // Handle multiline comments
-                const lines = wrapText(ctx, reportComment, tempCanvas.width - 100, 50, yPosition, 25);
-                yPosition += lines * 25;
+                const lines = wrapText(ctx, reportComment, tempCanvas.width - 100, 50, yPosition, 20);
+                yPosition += lines * 20;
             }
             
             // Draw duration measurements if available - WITH LABELS
             if (startTimeMeasure1 !== '--' && endTimeMeasure1 !== '--') {
-                yPosition += 40;
+                yPosition += 30;
                 ctx.font = 'bold 18px Arial';
                 ctx.fillText('Duration Measurement 1:', 50, yPosition);
-                yPosition += 30;
+                yPosition += 25;
                 ctx.font = '16px Arial';
                 ctx.fillText(`🟣M1 Start: ${startTimeMeasure1}`, 50, yPosition);
-                yPosition += 25;
+                yPosition += 20;
                 ctx.fillText(`🟣M1 End: ${endTimeMeasure1}`, 50, yPosition);
-                yPosition += 25;
+                yPosition += 20;
                 ctx.fillText(`Duration: ${durationMeasure1}`, 50, yPosition);
             }
             
             if (startTimeMeasure2 !== '--' && endTimeMeasure2 !== '--') {
-                yPosition += 40;
+                yPosition += 30;
                 ctx.font = 'bold 18px Arial';
                 ctx.fillText('Duration Measurement 2:', 50, yPosition);
-                yPosition += 30;
+                yPosition += 25;
                 ctx.font = '16px Arial';
                 ctx.fillText(`🟠M2 Start: ${startTimeMeasure2}`, 50, yPosition);
-                yPosition += 25;
+                yPosition += 20;
                 ctx.fillText(`🟠M2 End: ${endTimeMeasure2}`, 50, yPosition);
-                yPosition += 25;
+                yPosition += 20;
                 ctx.fillText(`Duration: ${durationMeasure2}`, 50, yPosition);
             }
             
-            // Draw the chart - position it lower to make room for all text
-            ctx.drawImage(chartCanvas, 0, yPosition + 30);
+            // Draw the chart - position it with dynamically calculated space
+            ctx.drawImage(chartCanvas, 0, yPosition + 20);
             
             // Create download link
             const link = document.createElement('a');
