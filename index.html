@@ -1086,42 +1086,49 @@
             document.getElementById('removedCount').textContent = removedSpikesCount;
         }
 
-        function removeTemperatureSpikesAndFalls(data) {
-            const threshold = parseFloat(document.getElementById('spikeThreshold').value);
-            let removedCount = 0;
+       function removeTemperatureSpikesAndFalls(data) {
+    const threshold = parseFloat(document.getElementById('spikeThreshold').value);
+    let removedCount = 0;
+    
+    if (data.length < 3) return data; // Not enough data to detect spikes/falls
+    
+    // Create a copy of the data to work with
+    const filteredData = [...data];
+    
+    // Check for spikes and falls in each kettle column
+    for (let col = 1; col <= 3; col++) {
+        for (let i = 1; i < filteredData.length - 1; i++) {
+            const prevTemp = parseFloat(filteredData[i-1][col]);
+            const currTemp = parseFloat(filteredData[i][col]);
+            const nextTemp = parseFloat(filteredData[i+1][col]);
             
-            if (data.length < 3) return data; // Not enough data to detect spikes/falls
+            // Skip if any temperature is invalid
+            if (isNaN(prevTemp) || isNaN(currTemp) || isNaN(nextTemp)) continue;
             
-            // Create a copy of the data to work with
-            const filteredData = [...data];
-            
-            // Check for spikes and falls in each kettle column
-            for (let col = 1; col <= 3; col++) {
-                for (let i = 1; i < filteredData.length - 1; i++) {
-                    const prevTemp = parseFloat(filteredData[i-1][col]);
-                    const currTemp = parseFloat(filteredData[i][col]);
-                    const nextTemp = parseFloat(filteredData[i+1][col]);
-                    
-                    // Skip if any temperature is invalid
-                    if (isNaN(prevTemp) || isNaN(currTemp) || isNaN(nextTemp)) continue;
-                    
-                    // Calculate temperature differences (absolute values)
-                    const diffPrev = Math.abs(currTemp - prevTemp);
-                    const diffNext = Math.abs(currTemp - nextTemp);
-                    
-                    // If both differences exceed threshold, it's likely a spike or fall
-                    if (diffPrev > threshold && diffNext > threshold) {
-                        // Replace the spike/fall with an interpolated value
-                        filteredData[i][col] = ((prevTemp + nextTemp) / 2).toFixed(2);
-                        removedCount++;
-                    }
-                }
+            // Special hidden rule for Kettle 3: Remove 83°C and 85°C readings
+            if (col === 3 && (currTemp === 83 || currTemp === 85)) {
+                // Replace with interpolated value
+                filteredData[i][col] = ((prevTemp + nextTemp) / 2).toFixed(2);
+                removedCount++;
+                continue;
             }
             
-            removedSpikesCount = removedCount;
-            return filteredData;
+            // Calculate temperature differences (absolute values)
+            const diffPrev = Math.abs(currTemp - prevTemp);
+            const diffNext = Math.abs(currTemp - nextTemp);
+            
+            // If both differences exceed threshold, it's likely a spike or fall
+            if (diffPrev > threshold && diffNext > threshold) {
+                // Replace the spike/fall with an interpolated value
+                filteredData[i][col] = ((prevTemp + nextTemp) / 2).toFixed(2);
+                removedCount++;
+            }
         }
-
+    }
+    
+    removedSpikesCount = removedCount;
+    return filteredData;
+}
         function updateStats(data) {
             if (data.length > 0) {
                 const firstTime = parseTimestamp(data[0][0]);
