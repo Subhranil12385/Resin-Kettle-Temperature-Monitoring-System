@@ -683,11 +683,33 @@
                 <div class="filter-controls">
                     <div class="control-group">
                         <label for="spikeThreshold">Spike/Fall Detection Threshold</label>
-                        <input type="number" id="spikeThreshold" value="0.1" min="0.0001" max="50" step="0.01">
+
+
+
+
+                        <input type="number" id="spikeThreshold" value="10" min="0.0001" max="50" step="0.01">
+<!-- increase value according the requirement. that is the threshold by befault  -->
+
+
                     </div>
                     <div class="control-group">
                         <label for="enableFiltering">Enable Spike/Fall Filtering</label>
+
+
+
+
+ 
+<!-- To keep filtering enabled by default, keep "checked" after "enableFiltering"  -->
+
                         <input type="checkbox" id="enableFiltering" checked>
+
+<!-- To keep filtering disabled by default, remove "checked". The below is the old line -->
+<!-- <input type="checkbox" id="enableFiltering" checked> -->
+
+
+
+
+
                     </div>
                     <button class="btn-secondary" onclick="filterAndDisplayData()">Apply Filter</button>
                 </div>
@@ -802,7 +824,7 @@
     </div>
 
     <script>
-        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz533l37X4JtvmdgaFDBvUsKe5GEY-8oTWNvbVPqgSypg97QOwDTbjEGLyn3-OIrSa1/exec';
+        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxJZMmRv5j_3yrXKi0DavTHA8VGmccDeBURN8vIemGAmP7OM2teDd5kcyijYLmGm3dI/exec';
         let chart = null;
         let allData = [];
         let filteredData = [];
@@ -1086,14 +1108,27 @@
             document.getElementById('removedCount').textContent = removedSpikesCount;
         }
 
-       function removeTemperatureSpikesAndFalls(data) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+function removeTemperatureSpikesAndFalls(data) {
     const threshold = parseFloat(document.getElementById('spikeThreshold').value);
     let removedCount = 0;
     
-    if (data.length < 3) return data; // Not enough data to detect spikes/falls
+    if (data.length < 3) return data;
     
-    // Create a copy of the data to work with
-    const filteredData = [...data];
+    // Create a DEEP copy of the data to work with - don't modify the input
+    const filteredData = data.map(row => [...row]);
     
     // Check for spikes and falls in each kettle column
     for (let col = 1; col <= 3; col++) {
@@ -1104,14 +1139,6 @@
             
             // Skip if any temperature is invalid
             if (isNaN(prevTemp) || isNaN(currTemp) || isNaN(nextTemp)) continue;
-            
-            // Special hidden rule for Kettle 3: Remove 83°C and 85°C readings
-            if (col === 3 && (currTemp === 83 || currTemp === 85)) {
-                // Replace with interpolated value
-                filteredData[i][col] = ((prevTemp + nextTemp) / 2).toFixed(2);
-                removedCount++;
-                continue;
-            }
             
             // Calculate temperature differences (absolute values)
             const diffPrev = Math.abs(currTemp - prevTemp);
@@ -1129,6 +1156,36 @@
     removedSpikesCount = removedCount;
     return filteredData;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         function updateStats(data) {
             if (data.length > 0) {
                 const firstTime = parseTimestamp(data[0][0]);
