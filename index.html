@@ -1275,52 +1275,80 @@ function removeTemperatureSpikesAndFalls(data) {
             const datasets = [];
             
             if (kettle1Checked) {
-                datasets.push({
-                    label: 'Kettle 1',
-                    data: temp1Data,
-                    borderColor: '#ef4444',
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    pointRadius: temp1Highlight.map(color => color ? 6 : 2),
-                    pointBackgroundColor: temp1Highlight.map(color => color || '#ef4444'),
-                    pointBorderColor: temp1Highlight.map(color => color ? 'white' : '#ef4444'),
-                    pointBorderWidth: temp1Highlight.map(color => color ? 2 : 0),
-                    pointHoverRadius: 8
-                });
+               datasets.push({
+    label: 'Kettle 1',
+    data: temp1Data,
+    borderColor: '#ef4444',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderWidth: 2,
+    tension: 0.4,
+    pointRadius: temp1Highlight.map(color => color ? 6 : 2),
+    pointBackgroundColor: temp1Highlight.map(color => color || '#ef4444'),
+    pointBorderColor: temp1Highlight.map(color => color ? 'white' : '#ef4444'),
+    pointBorderWidth: temp1Highlight.map(color => color ? 2 : 0),
+    pointHoverRadius: 8,
+    spanGaps: true,  // Add this line
+    segment: {       // Add this object
+        borderColor: ctx => {
+            // Make sure line connects through null values
+            return ctx.p0.parsed.y !== null && ctx.p1.parsed.y !== null ? 
+                   '#ef4444' : 
+                   'transparent';
+        }
+    }
+});
             }
             
             if (kettle2Checked) {
-                datasets.push({
-                    label: 'Kettle 2',
-                    data: temp2Data,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    pointRadius: temp2Highlight.map(color => color ? 6 : 2),
-                    pointBackgroundColor: temp2Highlight.map(color => color || '#3b82f6'),
-                    pointBorderColor: temp2Highlight.map(color => color ? 'white' : '#3b82f6'),
-                    pointBorderWidth: temp2Highlight.map(color => color ? 2 : 0),
-                    pointHoverRadius: 8
-                });
+                if (kettle2Checked) {
+    datasets.push({
+        label: 'Kettle 2',
+        data: temp2Data,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: temp2Highlight.map(color => color ? 6 : 2),
+        pointBackgroundColor: temp2Highlight.map(color => color || '#3b82f6'),
+        pointBorderColor: temp2Highlight.map(color => color ? 'white' : '#3b82f6'),
+        pointBorderWidth: temp2Highlight.map(color => color ? 2 : 0),
+        pointHoverRadius: 8,
+        spanGaps: true,  // Add this line
+        segment: {       // Add this object
+            borderColor: ctx => {
+                return ctx.p0.parsed.y !== null && ctx.p1.parsed.y !== null ? 
+                       '#3b82f6' : 
+                       'transparent';
+            }
+        }
+    });
+
             }
             
             if (kettle3Checked) {
-                datasets.push({
-                    label: 'Kettle 3',
-                    data: temp3Data,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    pointRadius: temp3Highlight.map(color => color ? 6 : 2),
-                    pointBackgroundColor: temp3Highlight.map(color => color || '#10b981'),
-                    pointBorderColor: temp3Highlight.map(color => color ? 'white' : '#10b981'),
-                    pointBorderWidth: temp3Highlight.map(color => color ? 2 : 0),
-                    pointHoverRadius: 8
-                });
+                if (kettle3Checked) {
+    datasets.push({
+        label: 'Kettle 3',
+        data: temp3Data,
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: temp3Highlight.map(color => color ? 6 : 2),
+        pointBackgroundColor: temp3Highlight.map(color => color || '#10b981'),
+        pointBorderColor: temp3Highlight.map(color => color ? 'white' : '#10b981'),
+        pointBorderWidth: temp3Highlight.map(color => color ? 2 : 0),
+        pointHoverRadius: 8,
+        spanGaps: true,  // Add this line
+        segment: {       // Add this object
+            borderColor: ctx => {
+                return ctx.p0.parsed.y !== null && ctx.p1.parsed.y !== null ? 
+                       '#10b981' : 
+                       'transparent';
             }
+        }
+    });
+}
             
             chart = new Chart(ctx, {
                 type: 'line',
