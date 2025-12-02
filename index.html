@@ -692,7 +692,7 @@
                     <button class="btn-secondary" onclick="filterAndDisplayData()">Apply Filter</button>
                 </div>
                 <div class="filter-info">
-                    <p>Spike/fall filtering removes noisy reading</p>
+                    <p>Spike/fall filtering removes noisy reading. Set to 0 for even smoother graph</p>
                     <p>Removed data points: <span class="removed-count" id="removedCount">0</span></p>
                 </div>
             </div>
@@ -802,7 +802,7 @@
     </div>
 
     <script>
-        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz533l37X4JtvmdgaFDBvUsKe5GEY-8oTWNvbVPqgSypg97QOwDTbjEGLyn3-OIrSa1/exec';
+        const SHEET_URL = 'https://script.google.com/macros/s/AKfycbw1Yj4Ct-2BR1mrk-FZ5Il7LxMHMJ8KNk4RE1F_ryJuVQ1ZIK3JaL5sqP9Zbi_hiWHb/exec';
         let chart = null;
         let allData = [];
         let filteredData = [];
@@ -958,7 +958,6 @@
         async function loadData() {
             showLoading();
             try {
-                // Use the original URL without parameters
                 const response = await fetch(SHEET_URL);
                 const data = await response.json();
                 
@@ -974,7 +973,13 @@
                     return;
                 }
 
-                updateStatus();
+                // Update status using the new statusInfo from API
+                if (data.statusInfo) {
+                    updateStatusFromAPI(data.statusInfo);
+                } else {
+                    updateStatus(); // Fallback to old method
+                }
+                
                 filterAndDisplayData();
                 
                 // Mark first load as complete
@@ -985,6 +990,37 @@
             } finally {
                 hideLoading();
             }
+        }
+
+        function updateStatusFromAPI(statusInfo) {
+            // Update online/offline status
+            const statusBadge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+            const statusValue = statusInfo.status.toString().toUpperCase();
+            
+            if (statusValue === 'ONLINE') {
+                statusBadge.className = 'status-badge online';
+                statusText.textContent = 'ONLINE';
+            } else if (statusValue === 'OFFLINE') {
+                statusBadge.className = 'status-badge offline';
+                statusText.textContent = 'OFFLINE';
+            } else {
+                statusBadge.className = 'status-badge offline';
+                statusText.textContent = 'UNKNOWN';
+            }
+
+            // Update last update time from Sheet1's last timestamp
+            if (statusInfo.lastTimestamp) {
+                const lastTimestamp = parseTimestamp(statusInfo.lastTimestamp);
+                document.getElementById('lastUpdate').textContent = lastTimestamp.toLocaleString();
+            } else {
+                document.getElementById('lastUpdate').textContent = '--';
+            }
+            
+            // Update current temperatures from L2, M2, N2
+            updateTempBox(1, statusInfo.temp1);
+            updateTempBox(2, statusInfo.temp2);
+            updateTempBox(3, statusInfo.temp3);
         }
 
         function updateStatus() {
@@ -1054,17 +1090,26 @@
             const startDateTime = new Date(startDate + 'T' + startTime);
             const endDateTime = new Date(endDate + 'T' + endTime);
 
-            // First filter by date/time
+            // First filter by date/time and sort by timestamp
             const timeFilteredData = [];
             
             for (let i = 1; i < allData.length; i++) {
                 const timestamp = parseTimestamp(allData[i][0]);
                 if (timestamp >= startDateTime && timestamp <= endDateTime) {
-                    timeFilteredData.push(allData[i]);
+                    timeFilteredData.push({
+                        timestamp: timestamp,
+                        row: [...allData[i]] // Create a copy of the row
+                    });
                 }
             }
+            
+            // Sort by timestamp to ensure continuous data
+            timeFilteredData.sort((a, b) => a.timestamp - b.timestamp);
+            
+            // Extract sorted rows (these are already copies)
+            const sortedData = timeFilteredData.map(item => item.row);
 
-            if (timeFilteredData.length === 0) {
+            if (sortedData.length === 0) {
                 showError('No data found for selected date/time range');
                 return;
             }
@@ -1072,9 +1117,10 @@
             // Apply spike filtering if enabled
             const enableFiltering = document.getElementById('enableFiltering').checked;
             if (enableFiltering) {
-                filteredData = removeTemperatureSpikesAndFalls(timeFilteredData);
+                filteredData = removeTemperatureSpikesAndFalls(sortedData);
             } else {
-                filteredData = timeFilteredData;
+                // IMPORTANT: When filtering is disabled, restore original values
+                filteredData = sortedData.map(row => [...row]); // Create fresh copy
                 removedSpikesCount = 0;
             }
 
@@ -1086,49 +1132,60 @@
             document.getElementById('removedCount').textContent = removedSpikesCount;
         }
 
-       function removeTemperatureSpikesAndFalls(data) {
-    const threshold = parseFloat(document.getElementById('spikeThreshold').value);
-    let removedCount = 0;
-    
-    if (data.length < 3) return data; // Not enough data to detect spikes/falls
-    
-    // Create a copy of the data to work with
-    const filteredData = [...data];
-    
-    // Check for spikes and falls in each kettle column
-    for (let col = 1; col <= 3; col++) {
-        for (let i = 1; i < filteredData.length - 1; i++) {
-            const prevTemp = parseFloat(filteredData[i-1][col]);
-            const currTemp = parseFloat(filteredData[i][col]);
-            const nextTemp = parseFloat(filteredData[i+1][col]);
+        // IMPROVED FUNCTION: Combines smoothness of 1.html with recovery of 2.html
+        function removeTemperatureSpikesAndFalls(data) {
+            const threshold = parseFloat(document.getElementById('spikeThreshold').value);
+            let removedCount = 0;
             
-            // Skip if any temperature is invalid
-            if (isNaN(prevTemp) || isNaN(currTemp) || isNaN(nextTemp)) continue;
+            if (data.length < 3) return data; // Not enough data to detect spikes/falls
             
-            // Special hidden rule for Kettle 3: Remove 83°C and 85°C readings
-            if (col === 3 && (currTemp === 83 || currTemp === 85)) {
-                // Replace with interpolated value
-                filteredData[i][col] = ((prevTemp + nextTemp) / 2).toFixed(2);
-                removedCount++;
-                continue;
+            // Create a DEEP copy of the data to work with (from 2.html)
+            const filteredData = data.map(row => [...row]);
+            
+            // Check for spikes and falls in each kettle column
+            for (let col = 1; col <= 3; col++) {
+                for (let i = 1; i < filteredData.length - 1; i++) {
+                    // Read from filteredData (not original data) for proper cascade smoothing
+                    const prevTemp = parseFloat(filteredData[i-1][col]);
+                    const currTemp = parseFloat(filteredData[i][col]);
+                    const nextTemp = parseFloat(filteredData[i+1][col]);
+                    
+                    // Skip if any temperature is invalid
+                    if (isNaN(prevTemp) || isNaN(currTemp) || isNaN(nextTemp)) continue;
+                    
+                    // Special hidden rule for Kettle 3: Remove 83°C and 85°C readings
+                    if (col === 3 && (currTemp === 83 || currTemp === 85)) {
+                        // Replace with interpolated value using the GOOD formula from 1.html
+                        filteredData[i][col] = ((prevTemp + nextTemp) / 2).toFixed(2);
+                        removedCount++;
+                        continue;
+                    }
+                    
+                    // Calculate temperature differences (IMPROVED FORMULA from 1.html)
+                    const diffPrev = Math.abs(currTemp - prevTemp);
+                    const diffNext = Math.abs(currTemp - nextTemp);
+                    
+                    // Check if current value is significantly different from both neighbors
+                    // This is the key improvement from 1.html - uses linear interpolation
+                    if (diffPrev > threshold && diffNext > threshold) {
+                        // Calculate the expected value based on linear interpolation
+                        // Using the simple and effective formula from 1.html
+                        const expectedValue = (prevTemp + nextTemp) / 2;
+                        
+                        // Check if the current value deviates significantly from expected
+                        if (Math.abs(currTemp - expectedValue) > threshold) {
+                            // Replace spike with interpolated value
+                            filteredData[i][col] = expectedValue.toFixed(2);
+                            removedCount++;
+                        }
+                    }
+                }
             }
             
-            // Calculate temperature differences (absolute values)
-            const diffPrev = Math.abs(currTemp - prevTemp);
-            const diffNext = Math.abs(currTemp - nextTemp);
-            
-            // If both differences exceed threshold, it's likely a spike or fall
-            if (diffPrev > threshold && diffNext > threshold) {
-                // Replace the spike/fall with an interpolated value
-                filteredData[i][col] = ((prevTemp + nextTemp) / 2).toFixed(2);
-                removedCount++;
-            }
+            removedSpikesCount = removedCount;
+            return filteredData;
         }
-    }
-    
-    removedSpikesCount = removedCount;
-    return filteredData;
-}
+
         function updateStats(data) {
             if (data.length > 0) {
                 const firstTime = parseTimestamp(data[0][0]);
@@ -1311,7 +1368,8 @@
                             },
                             ticks: {
                                 maxRotation: 90,
-                                minRotation: 90
+                                minRotation: 90,
+                                padding: 15  // increases space at bottom
                             }
                         },
                         y: {
