@@ -397,17 +397,103 @@
             border-color: #667eea;
         }
 
+        /* Enhanced Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .loading-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-title {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .loading-quote-container {
+            min-height: 120px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-quote {
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid;
+            position: absolute;
+            width: 100%;
+        }
+
+        /* New smooth transition animations */
+        @keyframes quoteFadeOutUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+        }
+
+        @keyframes quoteFadeInDown {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-icons-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .loading-icon {
+            width: 60px;
+            height: 60px;
+            position: relative;
         }
 
         .spinner {
@@ -416,7 +502,119 @@
             border: 5px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .dots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .line {
+            width: 60px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 30%;
+            background: white;
+            animation: lineMove 2s infinite ease-in-out;
+        }
+
+        @keyframes lineMove {
+            0% { left: -30%; }
+            100% { left: 130%; }
+        }
+
+        .hourglass {
+            width: 40px;
+            height: 50px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .hourglass::before,
+        .hourglass::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+        }
+
+        .hourglass::before {
+            top: 0;
+            border-top: 25px solid white;
+            animation: topSand 3s infinite;
+        }
+
+        .hourglass::after {
+            bottom: 0;
+            border-bottom: 25px solid white;
+            animation: bottomSand 3s infinite;
+        }
+
+        @keyframes topSand {
+            0%, 50% { border-top-color: white; }
+            51%, 100% { border-top-color: rgba(255, 255, 255, 0.3); }
+        }
+
+        @keyframes bottomSand {
+            0%, 50% { border-bottom-color: rgba(255, 255, 255, 0.3); }
+            51%, 100% { border-bottom-color: white; }
+        }
+
+        .loading-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .loading-status {
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 15px;
+            font-size: 0.9em;
         }
 
         @keyframes spin {
@@ -552,6 +750,43 @@
     </style>
 </head>
 <body>
+    <!-- Enhanced Loading Overlay -->
+    <div id="enhancedLoadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-title">Resin Kettle Dashboard</div>
+            
+            <div class="loading-quote-container">
+                <div id="loadingQuote" class="loading-quote"></div>
+            </div>
+            
+            <div class="loading-icons-container">
+                <div class="loading-icon">
+                    <div class="spinner"></div>
+                </div>
+                <div class="loading-icon">
+                    <div class="dots">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+                <div class="loading-icon">
+                    <div class="line"></div>
+                </div>
+                <div class="loading-icon">
+                    <div class="hourglass"></div>
+                </div>
+            </div>
+            
+            <div class="loading-progress">
+                <div id="loadingProgressBar" class="loading-progress-bar"></div>
+            </div>
+            
+            <div id="loadingStatus" class="loading-status">Initializing dashboard...</div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
     <div class="container">
         <div class="header">
             <h1>🌡️Resin Kettle Temperature Monitoring Dashboard - CPIL Chennai</h1>
@@ -629,6 +864,7 @@
                 <button class="btn-primary" onclick="loadData()">📊 Load Data</button>
                 <button class="btn-secondary active" id="todayBtn" onclick="setToday()">Today</button>
                 <button class="btn-secondary" id="last24Btn" onclick="setLast24Hours()">Last 24 Hours</button>
+                <button class="btn-secondary" id="last3DaysBtn" onclick="setLast3Days()">Last 3 Days</button>
                 <button class="btn-secondary" id="thisWeekBtn" onclick="setThisWeek()">This Week</button>
             </div>
             <div class="auto-refresh-control">
@@ -797,10 +1033,6 @@
         </div>
     </div>
 
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-    </div>
-
     <script>
         const SHEET_URL = 'https://script.google.com/macros/s/AKfycbw1Yj4Ct-2BR1mrk-FZ5Il7LxMHMJ8KNk4RE1F_ryJuVQ1ZIK3JaL5sqP9Zbi_hiWHb/exec';
         let chart = null;
@@ -820,11 +1052,191 @@
             m2: []
         };
         let removedSpikesCount = 0;
+        let loadingInterval = null;
+        let quoteIndex = 0;
+        let loadingProgress = 0;
 
-        // Initialize
+        // Random quotes with RGB colors
+        const loadingQuotes = [
+            { text: "Temperature is the silent language of processes", color: "rgb(102, 126, 234)" },
+            { text: "Precision monitoring ensures quality production", color: "rgb(239, 68, 68)" },
+            { text: "Data is the new oil, insights are the refined fuel", color: "rgb(16, 185, 129)" },
+            { text: "Every degree tells a story of chemical transformation", color: "rgb(245, 158, 11)" },
+            { text: "Real-time analytics drive operational excellence", color: "rgb(139, 92, 246)" },
+            { text: "The perfect batch starts with perfect monitoring", color: "rgb(59, 130, 246)" },
+            { text: "From raw data to actionable intelligence", color: "rgb(236, 72, 153)" },
+            { text: "Consistency is the hallmark of industrial excellence", color: "rgb(20, 184, 166)" },
+            { text: "Temperature control is the backbone of industrial reliability", color: "rgb(218, 85, 67)" },
+            { text: "Automation turns consistency into a habit", color: "rgb(34, 151, 210)" },
+            { text: "Smart factories don't guess — they measure", color: "rgb(131, 204, 70)" },
+            { text: "Behind every great product lies precise monitoring", color: "rgb(255, 142, 55)" },
+            { text: "Accuracy today prevents downtime tomorrow", color: "rgb(90, 82, 219)" },
+            { text: "Vibration speaks louder than failure — if you listen", color: "rgb(230, 60, 108)" },
+            { text: "When data flows smoothly, production does too", color: "rgb(51, 187, 165)" },
+            { text: "Efficiency is engineered, not imagined", color: "rgb(176, 112, 255)" },
+            { text: "Calibration builds confidence in every measurement", color: "rgb(236, 96, 32)" },
+            { text: "Automation is the art of eliminating unpredictability", color: "rgb(53, 198, 242)" },
+            { text: "Industrial intelligence begins at the sensor", color: "rgb(123, 189, 78)" },
+            { text: "A controlled environment is the home of quality", color: "rgb(255, 175, 80)" },
+            { text: "Downtime is expensive — monitoring is cheap", color: "rgb(101, 87, 234)" },
+            { text: "Sensors don't lie — they warn", color: "rgb(245, 76, 122)" },
+            { text: "Process optimization is a journey powered by data", color: "rgb(25, 183, 162)" },
+            { text: "Innovation begins where measurements improve", color: "rgb(178, 120, 251)" },
+            { text: "Industrial health is measured in degrees and hertz", color: "rgb(255, 93, 52)" },
+            { text: "Insight is the real outcome of monitoring", color: "rgb(64, 175, 232)" },
+            { text: "We don't just track data — we understand behavior", color: "rgb(120, 208, 65)" },
+            { text: "Every stable temperature protects the product", color: "rgb(254, 153, 48)" },
+            { text: "Consistency is the bridge between reliability and trust", color: "rgb(85, 77, 222)" },
+            { text: "Predictive maintenance starts with attention to detail", color: "rgb(238, 65, 137)" },
+            { text: "Let data drive the decisions, not assumptions", color: "rgb(43, 193, 178)" },
+            { text: "Measurement is the first step of optimization", color: "rgb(170, 118, 247)" },
+            { text: "When parameters stay stable, operations stay profitable", color: "rgb(255, 108, 41)" },
+            { text: "Behind every stable process is a disciplined monitoring system", color: "rgb(29, 164, 226)" },
+            { text: "Industrial excellence begins with awareness", color: "rgb(129, 200, 62)" },
+            { text: "A small deviation today is a big breakdown tomorrow", color: "rgb(254, 166, 72)" },
+            { text: "Nothing improves unless it is measured", color: "rgb(110, 88, 241)" },
+            { text: "Sensors see what humans miss", color: "rgb(242, 72, 119)" },
+            { text: "Automation transforms problems into predictions", color: "rgb(72, 197, 187)" },
+            { text: "Every alert prevents a future failure", color: "rgb(187, 100, 255)" },
+            { text: "Energy saved is efficiency earned", color: "rgb(255, 90, 59)" },
+            { text: "A plant without data is a ship without a compass", color: "rgb(59, 162, 236)" },
+            { text: "Monitoring today secures tomorrow's output", color: "rgb(124, 192, 76)" },
+            { text: "Industrial success is built one data point at a time", color: "rgb(255, 168, 88)" },
+            { text: "Quality is not tested at the end — it is controlled throughout", color: "rgb(94, 78, 219)" },
+            { text: "Every well-regulated furnace shapes a better product", color: "rgb(238, 63, 132)" },
+            { text: "It's not monitoring — it's mastering the process", color: "rgb(26, 188, 175)" },
+            { text: "Modern factories talk through numbers", color: "rgb(173, 118, 251)" },
+            { text: "Even the smallest fluctuation matters", color: "rgb(255, 115, 44)" },
+            { text: "Industrial growth thrives on controlled conditions", color: "rgb(53, 165, 227)" },
+            { text: "The best performance lives within defined limits", color: "rgb(108, 203, 71)" },
+            { text: "Every parameter counts when consistency matters", color: "rgb(255, 143, 66)" },
+            { text: "You cannot fix what you do not monitor", color: "rgb(92, 83, 235)" },
+            { text: "Great factories listen to their machines", color: "rgb(243, 69, 131)" },
+            { text: "Prevention is cheaper than repair — sensors prove it", color: "rgb(32, 197, 180)" },
+            { text: "The smartest decisions come from the cleanest data", color: "rgb(182, 116, 255)" },
+            { text: "Accuracy is not optional — it is essential", color: "rgb(255, 102, 51)" },
+            { text: "Process visibility is the foundation of optimization", color: "rgb(67, 182, 240)" },
+            { text: "Every stable reading builds production confidence", color: "rgb(130, 201, 69)" },
+            { text: "Continuous monitoring builds continuous improvement", color: "rgb(255, 158, 62)" },
+            { text: "In industry, control is the highest form of care", color: "rgb(91, 80, 229)" },
+            { text: "Let machines tell you what they need — in data", color: "rgb(240, 71, 123)" },
+            { text: "Real reliability starts at the sensor level", color: "rgb(39, 178, 169)" },
+            { text: "Every record is a step toward perfection", color: "rgb(174, 121, 247)" },
+            { text: "Efficiency isn't magic — it's measurement", color: "rgb(255, 91, 42)" },
+            { text: "Industrial precision keeps businesses ahead", color: "rgb(62, 170, 236)" },
+            { text: "The safest plant is the one that listens to trends", color: "rgb(119, 196, 69)" },
+            { text: "Smart monitoring eliminates expensive surprises", color: "rgb(255, 173, 86)" },
+            { text: "The best factories don't react — they anticipate", color: "rgb(88, 79, 225)" },
+            { text: "Stability is the language of quality", color: "rgb(245, 66, 126)" },
+            { text: "Numbers never panic — they instruct", color: "rgb(36, 188, 171)" },
+            { text: "Safety begins with real-time awareness", color: "rgb(179, 115, 250)" },
+            { text: "Predict, prevent, produce — the industrial cycle", color: "rgb(255, 111, 48)" },
+            { text: "When systems talk, performance improves", color: "rgb(49, 169, 235)" },
+            { text: "A good reading is worth a thousand assumptions", color: "rgb(123, 205, 68)" },
+            { text: "Collect data like a scientist, use it like a strategist", color: "rgb(254, 150, 67)" },
+            { text: "The finest craftsmanship begins with the right temperature", color: "rgb(97, 84, 236)" },
+            { text: "Condition monitoring keeps industry unstoppable", color: "rgb(236, 64, 139)" },
+            { text: "Every precise measurement builds customer trust", color: "rgb(20, 188, 164)" },
+            { text: "Optimization isn't a project — it's a culture", color: "rgb(171, 119, 249)" },
+            { text: "Temperature is the heartbeat of production", color: "rgb(255, 98, 49)" },
+            { text: "Good data builds great manufacturing", color: "rgb(48, 172, 240)" },
+            { text: "Sensors protect success in silence", color: "rgb(115, 197, 73)" },
+            { text: "Industrial mastery is measured in decimals", color: "rgb(254, 161, 74)" },
+            { text: "Machines always whisper before they break", color: "rgb(93, 85, 231)" },
+            { text: "Automation isn't the future — it is the standard", color: "rgb(247, 71, 120)" },
+            { text: "Small sensors prevent big losses", color: "rgb(43, 195, 174)" },
+            { text: "Performance is predictable when parameters are controlled", color: "rgb(181, 119, 252)" },
+            { text: "Real-time insights separate leaders from followers", color: "rgb(255, 114, 57)" },
+            { text: "Quality begins at the point of measurement", color: "rgb(58, 166, 233)" },
+            { text: "Stop guessing. Start measuring.", color: "rgb(128, 203, 74)" },
+            { text: "Every sensor is a guardian of reliability", color: "rgb(255, 147, 71)" },
+            { text: "Industrial success is engineered — not left to chance", color: "rgb(84, 76, 230)" },
+            { text: "Performance without data is performance without direction", color: "rgb(242, 63, 129)" },
+            { text: "Data today prevents failure tomorrow", color: "rgb(22, 177, 162)" },
+            { text: "Even perfection needs monitoring", color: "rgb(176, 116, 250)" },
+            { text: "The most reliable factory is the most aware factory", color: "rgb(255, 105, 50)" },
+            { text: "Real-time measurement makes real-time control possible", color: "rgb(61, 180, 240)" },
+            { text: "Efficient processes start with transparent data", color: "rgb(119, 201, 72)" },
+            { text: "Production loves stability", color: "rgb(255, 168, 93)" },
+            { text: "Precision is profitable", color: "rgb(90, 83, 224)" },
+            { text: "The smallest alarm can save the biggest investment", color: "rgb(237, 67, 133)" },
+            { text: "Listen to your machinery, not your assumptions", color: "rgb(40, 187, 173)" },
+            { text: "Monitoring turns industrial chaos into industrial control", color: "rgb(183, 117, 253)" },
+            { text: "A good plant operates. A great plant monitors", color: "rgb(255, 95, 53)" },
+            { text: "Insight is the highest form of automation", color: "rgb(59, 175, 247)" },
+            { text: "Temperature discipline equals production excellence", color: "rgb(117, 208, 75)" },
+            { text: "When machines talk, good factories listen", color: "rgb(255, 152, 78)" },
+            { text: "Industrial leadership is data-driven", color: "rgb(95, 81, 227)" },
+            { text: "Every sensor is a step toward zero downtime", color: "rgb(244, 66, 128)" },
+            { text: "The best operators are the best observers", color: "rgb(33, 189, 175)" },
+            { text: "Data turns machines into teachers", color: "rgb(181, 118, 255)" },
+            { text: "Stability is a product of discipline", color: "rgb(255, 117, 47)" },
+            { text: "Factories don't fail — they warn", color: "rgb(52, 170, 238)" },
+            { text: "Analytics transforms monitoring into mastery", color: "rgb(126, 203, 66)" },
+            { text: "Good data saves more money than good repairs", color: "rgb(254, 157, 63)" },
+            { text: "Industrial success lives in the details", color: "rgb(86, 78, 222)" },
+            { text: "Every fluctuation is an insight in disguise", color: "rgb(239, 70, 136)" },
+            { text: "Automation begins by paying attention", color: "rgb(23, 181, 167)" },
+            { text: "Measurement before management", color: "rgb(177, 118, 252)" },
+            { text: "Control your process or your process will control production", color: "rgb(255, 112, 55)" },
+            { text: "A healthy machine is a monitored machine", color: "rgb(66, 174, 239)" },
+            { text: "Failure never happens suddenly — the numbers reveal it", color: "rgb(122, 204, 72)" },
+            { text: "Sensors are the eyes of modern manufacturing", color: "rgb(255, 169, 89)" },
+            { text: "Industrial excellence is built on feedback", color: "rgb(89, 81, 229)" },
+            { text: "Stability reduces cost more than budget cuts", color: "rgb(246, 68, 130)" },
+            { text: "Metrics transform processes from guesswork to engineering", color: "rgb(46, 190, 178)" },
+            { text: "Factories evolve when measurements evolve", color: "rgb(180, 117, 253)" },
+            { text: "Knowledge is profitable — especially in real time", color: "rgb(255, 109, 52)" },
+            { text: "Smart plants convert data into decisions", color: "rgb(60, 169, 236)" },
+            { text: "Quality control begins with parameter control", color: "rgb(120, 203, 70)" },
+            { text: "Even the best machines need supervision", color: "rgb(255, 158, 87)" },
+            { text: "Industrial safety is powered by industrial awareness", color: "rgb(87, 79, 223)" },
+            { text: "Every alert is a protector, not a disturbance", color: "rgb(240, 69, 134)" },
+            { text: "Great monitoring is silent success", color: "rgb(31, 189, 172)" },
+            { text: "Factories don't guess temperatures — they track them", color: "rgb(185, 117, 255)" },
+            { text: "Precision management is industrial leadership", color: "rgb(255, 102, 48)" },
+            { text: "A stable parameter today is a reliable batch tomorrow", color: "rgb(55, 180, 247)" },
+            { text: "Measured processes are manageable processes", color: "rgb(132, 207, 73)" },
+            { text: "Customers feel quality — operators measure it", color: "rgb(255, 153, 82)" },
+            { text: "Industrial greatness is built on controlled conditions", color: "rgb(89, 82, 230)" },
+            { text: "Monitoring keeps production honest", color: "rgb(241, 67, 135)" },
+            { text: "Optimization starts where assumptions end", color: "rgb(27, 188, 176)" },
+            { text: "Every scientist measures — every engineer monitors", color: "rgb(179, 119, 254)" },
+            { text: "The quietest factories have the most intelligent sensors", color: "rgb(255, 107, 49)" },
+            { text: "Industrial progress is measured, not imagined", color: "rgb(51, 169, 236)" },
+            { text: "Know the process, master the outcome", color: "rgb(117, 201, 72)" },
+            { text: "Data-driven factories outperform intention-driven factories", color: "rgb(255, 166, 91)" },
+            { text: "Process stability builds brand credibility", color: "rgb(92, 83, 224)" },
+            { text: "Your best operator is your monitoring system", color: "rgb(243, 67, 131)" },
+            { text: "Factories don't need luck — they need visibility", color: "rgb(39, 189, 172)" },
+            { text: "Every data point has a purpose", color: "rgb(175, 118, 252)" },
+            { text: "Information is the best maintenance tool", color: "rgb(255, 113, 55)" },
+            { text: "The most profitable processes are the most predictable", color: "rgb(63, 175, 239)" },
+            { text: "Good monitoring turns production into perfection", color: "rgb(124, 206, 70)" },
+            { text: "A factory without feedback is a factory without control", color: "rgb(255, 161, 75)" },
+            { text: "Industrial superiority is built on scientific precision", color: "rgb(93, 84, 226)" },
+            { text: "Data is the most reliable operator", color: "rgb(238, 68, 137)" },
+            { text: "Machines speak in patterns — monitoring translates", color: "rgb(33, 186, 171)" },
+            { text: "Predictive analytics is the language of the future factory", color: "rgb(184, 121, 255)" },
+            { text: "Control variability and you control profitability", color: "rgb(255, 98, 41)" },
+            { text: "Process intelligence turns noise into knowledge", color: "rgb(51, 168, 241)" },
+            { text: "Industrial peace exists where processes stay in range", color: "rgb(130, 200, 69)" },
+            { text: "Good data makes great decisions simple", color: "rgb(255, 171, 88)" },
+            { text: "Automation + Monitoring = Zero surprise manufacturing", color: "rgb(94, 82, 229)" },
+            { text: "Trust the sensors — they've seen everything", color: "rgb(245, 69, 125)" },
+            { text: "Invisible problems become visible with the right metrics", color: "rgb(21, 187, 168)" },
+            { text: "Every parameter monitored is a problem prevented", color: "rgb(178, 118, 252)" },
+            { text: "Data is the supervisor that never sleeps", color: "rgb(255, 109, 46)" },
+            { text: "Industrial victory is a sum of controlled variables", color: "rgb(60, 173, 239)" },
+            { text: "If monitoring is strong, production is strong", color: "rgb(121, 205, 71)" },
+            { text: "Consistency builds trust — monitoring builds consistency", color: "rgb(255, 165, 89)" },
+            { text: "Continuous measurement brings continuous success", color: "rgb(85, 77, 223)" }
+        ];
+
+        // Initialize with enhanced loading screen
         document.addEventListener('DOMContentLoaded', function() {
+            showEnhancedLoading();
             setToday();
-            loadData();
             
             // Add event listeners for kettle checkboxes
             document.getElementById('kettle1Check').addEventListener('change', filterAndDisplayData);
@@ -841,7 +1253,123 @@
             document.getElementById('spikeThreshold').addEventListener('input', function() {
                 document.getElementById('thresholdValue').textContent = this.value;
             });
+            
+            // Load data after showing loading screen
+            setTimeout(loadData, 1500);
         });
+
+        function showEnhancedLoading() {
+            const loadingOverlay = document.getElementById('enhancedLoadingOverlay');
+            loadingOverlay.style.display = 'flex';
+            
+            // Show first random quote immediately with fade in
+            showNextQuote();
+            
+            // Start random quote rotation with variable timing (3-4 seconds)
+            const startQuoteRotation = () => {
+                showNextQuote();
+                // Schedule next quote with random interval between 3000-4000ms
+                loadingInterval = setTimeout(startQuoteRotation, 3000 + Math.random() * 1000);
+            };
+            
+            // Start the rotation after initial display
+            setTimeout(startQuoteRotation, 4000); // First change after 4 seconds
+            
+            // Simulate loading progress
+            simulateLoadingProgress();
+        }
+
+        function hideEnhancedLoading() {
+            const loadingOverlay = document.getElementById('enhancedLoadingOverlay');
+            
+            // Complete progress bar
+            document.getElementById('loadingProgressBar').style.width = '100%';
+            document.getElementById('loadingStatus').textContent = 'Dashboard ready!';
+            
+            // Clear intervals and timeouts
+            if (loadingInterval) {
+                clearTimeout(loadingInterval);
+                loadingInterval = null;
+            }
+            
+            // Fade out after a short delay
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                loadingOverlay.style.transition = 'opacity 0.8s ease';
+                
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 800);
+            }, 800);
+        }
+
+        function showNextQuote() {
+            const quoteElement = document.getElementById('loadingQuote');
+            
+            // Add fade out and slide up animation
+            quoteElement.style.animation = 'quoteFadeOutUp 0.8s forwards';
+            
+            // After fade out, change the quote and fade in
+            setTimeout(() => {
+                // Get a random quote (different from current one)
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * loadingQuotes.length);
+                } while (randomIndex === quoteIndex && loadingQuotes.length > 1);
+                
+                const quote = loadingQuotes[randomIndex];
+                quoteIndex = randomIndex;
+                
+                // Update quote content and color
+                quoteElement.textContent = `"${quote.text}"`;
+                quoteElement.style.color = quote.color;
+                quoteElement.style.borderLeftColor = quote.color;
+                
+                // Remove previous animation and add fade in animation
+                quoteElement.style.animation = 'none';
+                // Force reflow to restart animation
+                void quoteElement.offsetWidth;
+                quoteElement.style.animation = 'quoteFadeInDown 0.8s forwards';
+                
+            }, 800); // Wait for fade out to complete
+        }
+
+        function simulateLoadingProgress() {
+            loadingProgress = 0;
+            const progressBar = document.getElementById('loadingProgressBar');
+            const statusText = document.getElementById('loadingStatus');
+            const statusMessages = [
+                "Initializing dashboard...",
+                "Connecting to temperature sensors...",
+                "Loading historical data...",
+                "Processing temperature trends...",
+                "Configuring chart visualization...",
+                "Finalizing dashboard components...",
+                "Dashboard ready!"
+            ];
+            
+            let currentStatus = 0;
+            
+            const progressInterval = setInterval(() => {
+                if (loadingProgress >= 100) {
+                    clearInterval(progressInterval);
+                    return;
+                }
+                
+                // Slower, more realistic progress
+                loadingProgress += Math.random() * 2 + 1; // 1-3% per interval
+                if (loadingProgress > 100) loadingProgress = 100;
+                
+                progressBar.style.width = loadingProgress + '%';
+                
+                // Update status text at certain progress points
+                const statusIndex = Math.floor(loadingProgress / (100 / (statusMessages.length - 1)));
+                if (statusIndex > currentStatus && statusIndex < statusMessages.length) {
+                    statusText.textContent = statusMessages[statusIndex];
+                    currentStatus = statusIndex;
+                }
+            }, 400); // Slightly slower interval
+        }
 
         function setActiveMeasurement(measurementNum) {
             currentMeasurement = measurementNum;
@@ -888,6 +1416,19 @@
             filterAndDisplayData();
         }
 
+        function setLast3Days() {
+            const now = new Date();
+            const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('endDate').value = now.toISOString().split('T')[0];
+            document.getElementById('endTime').value = '23:59';
+            document.getElementById('startDate').value = threeDaysAgo.toISOString().split('T')[0];
+            document.getElementById('startTime').value = '00:00';
+            
+            updateActiveButton('last3Days');
+            filterAndDisplayData();
+        }
+
         function setThisWeek() {
             const now = new Date();
             const dayOfWeek = now.getDay();
@@ -907,6 +1448,7 @@
             // Reset all buttons
             document.getElementById('todayBtn').classList.remove('active');
             document.getElementById('last24Btn').classList.remove('active');
+            document.getElementById('last3DaysBtn').classList.remove('active');
             document.getElementById('thisWeekBtn').classList.remove('active');
             
             // Activate the selected button
@@ -914,6 +1456,8 @@
                 document.getElementById('todayBtn').classList.add('active');
             } else if (buttonId === 'last24') {
                 document.getElementById('last24Btn').classList.add('active');
+            } else if (buttonId === 'last3Days') {
+                document.getElementById('last3DaysBtn').classList.add('active');
             } else if (buttonId === 'thisWeek') {
                 document.getElementById('thisWeekBtn').classList.add('active');
             }
@@ -956,7 +1500,6 @@
         }
 
         async function loadData() {
-            showLoading();
             try {
                 const response = await fetch(SHEET_URL);
                 const data = await response.json();
@@ -985,10 +1528,17 @@
                 // Mark first load as complete
                 isFirstLoad = false;
                 
+                // Hide loading screen if it's the first load
+                if (document.getElementById('enhancedLoadingOverlay').style.display === 'flex') {
+                    setTimeout(hideEnhancedLoading, 200);
+                }
+                
             } catch (error) {
                 showError('Failed to load data: ' + error.message);
-            } finally {
-                hideLoading();
+                // Still hide loading screen even if there's an error
+                if (document.getElementById('enhancedLoadingOverlay').style.display === 'flex') {
+                    setTimeout(hideEnhancedLoading, 200);
+                }
             }
         }
 
@@ -1369,7 +1919,7 @@
                             ticks: {
                                 maxRotation: 90,
                                 minRotation: 90,
-                                padding: 15  // increases space at bottom
+                                padding: 30  // increases space at bottom
                             }
                         },
                         y: {
@@ -1567,14 +2117,6 @@
             document.getElementById('errorMessage').style.display = 'none';
         }
 
-        function showLoading() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
         function downloadGraph() {
             // Get report data
             const graphTitle = document.getElementById('graphTitle').value || 'RESIN PLANT KETTLE TEMPERATURE MONITORING';
@@ -1738,7 +2280,7 @@
                 ctx.font = '16px Arial';
                 ctx.fillText(`🟠M2 Start: ${startTimeMeasure2}`, 50, yPosition);
                 yPosition += 20;
-                ctx.fillText(`🟠M2 End: ${endTimeMeasure2}`, 50, yPosition);
+                ctx.fillText(`🟠M2 End: ${startTimeMeasure2}`, 50, yPosition);
                 yPosition += 20;
                 ctx.fillText(`Duration: ${durationMeasure2}`, 50, yPosition);
             }
