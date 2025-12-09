@@ -747,6 +747,137 @@
             color: #ef4444;
             font-weight: bold;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.quick-buttons-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.quick-btn {
+    padding: 6px 12px;
+    border: 1px solid #667eea;
+    border-radius: 4px;
+    background: #f8fafc;
+    color: #667eea;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.quick-btn:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.quick-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .quick-buttons-group {
+        gap: 5px;
+    }
+    
+    .quick-btn {
+        padding: 5px 8px;
+        font-size: 0.8em;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Link Toggle Styles */
+.link-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 5px 10px;
+    background: #f1f5f9;
+    border-radius: 20px;
+    width: fit-content;
+    font-size: 0.85em;
+}
+
+.link-toggle input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.link-toggle label {
+    cursor: pointer;
+    color: #475569;
+    font-weight: 500;
+    user-select: none;
+}
+
+.link-toggle input[type="checkbox"]:checked {
+    accent-color: #10b981;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -981,37 +1112,89 @@
         <div class="report-section">
             <h2>📋 Report Generation</h2>
             <div class="report-form">
-                <div class="form-group">
-                    <label for="graphTitle">Graph Title</label>
-                    <input type="text" id="graphTitle" placeholder="e.g., Kettle 1 Temperature Analysis">
-                </div>
+
+
+
+
+
+<div class="form-group">
+    <label for="graphTitle">Graph Title</label>
+    <input type="text" id="graphTitle" placeholder="e.g., Kettle 1 Temperature Analysis">
+    
+    <!-- Link Toggle -->
+    <div class="link-toggle">
+        <input type="checkbox" id="linkToggle" checked>
+        <label for="linkToggle">Link with Resin Type</label>
+    </div>
+    
+    <!-- Graph Title Quick Buttons -->
+    <div class="quick-buttons-group">
+        <button type="button" class="quick-btn" onclick="handleGraphTitleClick('CPIL - 03 / PF')">CPIL - 03 / PF</button>
+        <button type="button" class="quick-btn" onclick="handleGraphTitleClick('CPIL - 03 / UF')">CPIL - 03 / UF</button>
+        <button type="button" class="quick-btn" onclick="handleGraphTitleClick('CPIL - 03 / MF')">CPIL - 03 / MF</button>
+        <button type="button" class="quick-btn" onclick="handleGraphTitleClick('CPIL - 03 / UMF')">CPIL - 03 / UMF</button>
+    </div>
+</div>
+
+
+
+
+
                 <div class="form-group">
                     <label for="kettleNo">Kettle No</label>
-                    <select id="kettleNo">
+                    <select id="kettleNo" onchange="handleKettleNoChange()">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="resinType">Resin</label>
-                    <select id="resinType" onchange="toggleOthersInput('resinOthers')">
-                        <option value="MF">MF</option>
-                        <option value="PF">PF</option>
-                        <option value="UF">UMF</option>
-                        <option value="UMF">UMF</option>
-                        <option value="Others">Others, Please specify</option>
-                    </select>
-                    <input type="text" id="resinOthers" class="others-input" placeholder="Specify resin type">
-                </div>
+
+
+
+
+
+<div class="form-group">
+    <label for="resinType">Resin</label>
+    <select id="resinType" onchange="handleResinTypeChange()">
+        <option value="MF">MF</option>
+        <option value="PF">PF</option>
+        <option value="UF">UF</option>
+        <option value="UMF">UMF</option>
+        <option value="Others">Others, Please specify</option>
+    </select>
+    <input type="text" id="resinOthers" class="others-input" placeholder="Specify resin type">
+</div>
+
+
+
+
+
+
+
+
+
+
                 <div class="form-group">
                     <label for="batchNo">Batch No.</label>
                     <input type="text" id="batchNo" placeholder="e.g., 36">
                 </div>
-                <div class="form-group">
-                    <label for="preparedBy">Prepared By</label>
-                    <input type="text" id="preparedBy" placeholder="e.g., Mr. XYZ">
-                </div>
+
+
+
+
+
+
+<div class="form-group">
+    <label for="preparedBy">Prepared By</label>
+    <input type="text" id="preparedBy" placeholder="e.g., Mr. XYZ">
+    
+    <!-- Prepared By Quick Buttons -->
+    <div class="quick-buttons-group">
+        <button type="button" class="quick-btn" onclick="setPreparedBy('MR. KARLUS SURIN')">MR. KARLUS SURIN</button>
+        <button type="button" class="quick-btn" onclick="setPreparedBy('MR. ROMAN')">MR. ROMAN</button>
+        <button type="button" class="quick-btn" onclick="setPreparedBy('MR. DAMODHAR')">MR. DAMODHAR</button>
+    </div>
+</div>
                 <div class="form-group">
                     <label for="batchQuality">Batch Quality</label>
                     <select id="batchQuality" onchange="toggleOthersInput('qualityOthers')">
@@ -1056,7 +1239,150 @@
         let loadingInterval = null;
         let quoteIndex = 0;
         let loadingProgress = 0;
+let isLinkingEnabled = true;
 
+// Function to handle Graph Title button clicks
+function handleGraphTitleClick(title) {
+    // Set the graph title
+    document.getElementById('graphTitle').value = title;
+    
+    // If linking is enabled, also update the Resin Type dropdown
+    if (isLinkingEnabled) {
+        // Extract resin type from title (e.g., "CPIL - 03 / PF" -> "PF")
+        const parts = title.split('/');
+        const resinType = parts[parts.length - 1].trim();
+        const resinTypeSelect = document.getElementById('resinType');
+        
+        // Set the resin type dropdown
+        for (let i = 0; i < resinTypeSelect.options.length; i++) {
+            if (resinTypeSelect.options[i].value === resinType) {
+                resinTypeSelect.selectedIndex = i;
+                break;
+            }
+        }
+        
+        // ALSO UPDATE KETTLE NO BASED ON RESIN TYPE
+        updateKettleNoFromResinType(resinType);
+        
+        // Trigger the change event to update others input
+        resinTypeSelect.dispatchEvent(new Event('change'));
+    }
+}
+
+// Function to handle Resin Type dropdown changes
+function handleResinTypeChange() {
+    const resinTypeSelect = document.getElementById('resinType');
+    const selectedResin = resinTypeSelect.value;
+    
+    // Always handle Others input visibility
+    toggleOthersInput('resinOthers');
+    
+    // If linking is enabled and not "Others", update the Graph Title
+    if (isLinkingEnabled && selectedResin !== 'Others') {
+        const graphTitle = `CPIL - 03 / ${selectedResin}`;
+        document.getElementById('graphTitle').value = graphTitle;
+        
+        // ALSO UPDATE KETTLE NO BASED ON RESIN TYPE
+        updateKettleNoFromResinType(selectedResin);
+    }
+    
+    // If "Others" is selected and linking is enabled, clear graph title
+    if (isLinkingEnabled && selectedResin === 'Others') {
+        document.getElementById('graphTitle').value = '';
+        // Don't change kettle no for "Others"
+    }
+}
+
+// Function to update Kettle No based on Resin Type
+function updateKettleNoFromResinType(resinType) {
+    const kettleNoSelect = document.getElementById('kettleNo');
+    
+    if (resinType === 'PF') {
+        // PF -> Kettle 1
+        kettleNoSelect.value = '1';
+    } else if (resinType === 'UF' || resinType === 'MF' || resinType === 'UMF') {
+        // UF/MF/UMF -> Kettle 3
+        kettleNoSelect.value = '3';
+    }
+    // For Kettle 2 - no automatic change (keep as is)
+    // For "Others" - no automatic change
+}
+
+// Function to handle Kettle No changes
+function handleKettleNoChange() {
+    if (!isLinkingEnabled) return;
+    
+    const kettleNo = document.getElementById('kettleNo').value;
+    const resinTypeSelect = document.getElementById('resinType');
+    const currentResin = resinTypeSelect.value;
+    
+    // Only suggest changes, don't force them
+    if (kettleNo === '1' && currentResin !== 'PF') {
+        // If user selects Kettle 1, suggest PF
+        console.log("Kettle 1 is typically used for PF resin");
+        // Optional: You could show a tooltip or hint here
+    } else if (kettleNo === '3' && !['UF', 'MF', 'UMF'].includes(currentResin)) {
+        // If user selects Kettle 3, suggest UF/MF/UMF
+        console.log("Kettle 3 is typically used for UF, MF, or UMF resin");
+        // Optional: You could show a tooltip or hint here
+    }
+}
+
+// Function to update the toggle state
+function updateLinkToggle() {
+    const toggle = document.getElementById('linkToggle');
+    isLinkingEnabled = toggle.checked;
+    
+    // Visual feedback
+    const label = toggle.nextElementSibling;
+    if (isLinkingEnabled) {
+        label.innerHTML = '<span style="color:#10b981">✓</span> Link with Resin Type & Kettle No';
+    } else {
+        label.innerHTML = '<span style="color:#ef4444">✗</span> Link with Resin Type & Kettle No';
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Keep the original toggleOthersInput function but update it
+function toggleOthersInput(inputId) {
+    const resinSelect = document.getElementById('resinType');
+    const qualitySelect = document.getElementById('batchQuality');
+    const resinOthers = document.getElementById('resinOthers');
+    const qualityOthers = document.getElementById('qualityOthers');
+    
+    // Show/hide resin others input
+    if (resinSelect.value === 'Others') {
+        resinOthers.classList.add('show');
+    } else {
+        resinOthers.classList.remove('show');
+        resinOthers.value = ''; // Clear the value when not showing
+    }
+    
+    // Show/hide quality others input
+    if (qualitySelect.value === 'Others') {
+        qualityOthers.classList.add('show');
+    } else {
+        qualityOthers.classList.remove('show');
+        qualityOthers.value = ''; // Clear the value when not showing
+    }
+}
+
+// Keep the original setPreparedBy function
+function setPreparedBy(name) {
+    document.getElementById('preparedBy').value = name;
+}
         // Random quotes with RGB colors
         const loadingQuotes = [
             { text: "Temperature is the silent language of processes", color: "rgb(102, 126, 234)" },
@@ -1235,29 +1561,36 @@
         ];
 
         // Initialize with enhanced loading screen
-        document.addEventListener('DOMContentLoaded', function() {
-            showEnhancedLoading();
-            setToday();
-            
-            // Add event listeners for kettle checkboxes
-            document.getElementById('kettle1Check').addEventListener('change', filterAndDisplayData);
-            document.getElementById('kettle2Check').addEventListener('change', filterAndDisplayData);
-            document.getElementById('kettle3Check').addEventListener('change', filterAndDisplayData);
-            
-            // Add event listeners for date/time inputs
-            document.getElementById('startDate').addEventListener('change', filterAndDisplayData);
-            document.getElementById('startTime').addEventListener('change', filterAndDisplayData);
-            document.getElementById('endDate').addEventListener('change', filterAndDisplayData);
-            document.getElementById('endTime').addEventListener('change', filterAndDisplayData);
-            
-            // Add event listener for threshold input
-            document.getElementById('spikeThreshold').addEventListener('input', function() {
-                document.getElementById('thresholdValue').textContent = this.value;
-            });
-            
-            // Load data after showing loading screen
-            setTimeout(loadData, 1500);
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    showEnhancedLoading();
+    setToday();
+    
+    // Add event listeners for kettle checkboxes
+    document.getElementById('kettle1Check').addEventListener('change', filterAndDisplayData);
+    document.getElementById('kettle2Check').addEventListener('change', filterAndDisplayData);
+    document.getElementById('kettle3Check').addEventListener('change', filterAndDisplayData);
+    
+    // Add event listeners for date/time inputs
+    document.getElementById('startDate').addEventListener('change', filterAndDisplayData);
+    document.getElementById('startTime').addEventListener('change', filterAndDisplayData);
+    document.getElementById('endDate').addEventListener('change', filterAndDisplayData);
+    document.getElementById('endTime').addEventListener('change', filterAndDisplayData);
+
+    // Initialize link toggle
+    document.getElementById('linkToggle').addEventListener('change', updateLinkToggle);
+    updateLinkToggle(); // Set initial state
+    
+    // Add Kettle No change listener
+    document.getElementById('kettleNo').addEventListener('change', handleKettleNoChange);
+    
+    // Add event listener for threshold input
+    document.getElementById('spikeThreshold').addEventListener('input', function() {
+        document.getElementById('thresholdValue').textContent = this.value;
+    });
+    
+    // Load data after showing loading screen
+    setTimeout(loadData, 1500);
+});
 
         function showEnhancedLoading() {
             const loadingOverlay = document.getElementById('enhancedLoadingOverlay');
@@ -1478,6 +1811,12 @@
                 }
             }
         }
+
+
+
+
+
+
 
         function toggleOthersInput(inputId) {
             const resinSelect = document.getElementById('resinType');
@@ -2184,7 +2523,7 @@
             // Draw report details in tabular form with proper grid lines
             const tableData = [
                 { label: 'Kettle No', value: kettleNo },
-                { label: 'Date', value: new Date().toLocaleDateString() },
+                { label: 'Date of report generation', value: new Date().toLocaleDateString() },
                 { label: 'Resin', value: finalResinType },
                 { label: 'Batch No', value: batchNo },
                 { label: 'Prepared By', value: preparedBy },
@@ -2319,6 +2658,24 @@
             ctx.fillText(line, x, y);
             return lines + 1;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
 </body>
 </html>
