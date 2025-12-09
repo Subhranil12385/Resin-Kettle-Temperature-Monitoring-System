@@ -822,37 +822,43 @@
 
 
 
-/* Link Toggle Styles */
+/* Link Toggle Styles - Full Width */
 .link-toggle {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin: 8px 0;
-    padding: 5px 10px;
-    background: #f1f5f9;
-    border-radius: 20px;
-    width: fit-content;
-    font-size: 0.85em;
+    gap: 10px;
+    margin: 12px 0;
+    padding: 12px 20px;
+    background: linear-gradient(to right, #f1f5f9, #e2e8f0);
+    border-radius: 8px;
+    width: 100%;
+    font-size: 0.95em;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .link-toggle input[type="checkbox"] {
     margin: 0;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .link-toggle label {
     cursor: pointer;
-    color: #475569;
-    font-weight: 500;
+    color: #334155;
+    font-weight: 600;
     user-select: none;
+    flex-grow: 1;
+    text-align: center;
+    font-size: 1em;
 }
 
 .link-toggle input[type="checkbox"]:checked {
     accent-color: #10b981;
+    transform: scale(1.1);
 }
-
 
 
 
@@ -1119,7 +1125,7 @@
 
 <div class="form-group">
     <label for="graphTitle">Graph Title</label>
-    <input type="text" id="graphTitle" placeholder="e.g., Kettle 1 Temperature Analysis">
+    <input type="text" id="graphTitle" placeholder="e.g., CPIL - XX / YY ">
     
     <!-- Link Toggle -->
     <div class="link-toggle">
@@ -1314,19 +1320,26 @@ function handleKettleNoChange() {
     
     const kettleNo = document.getElementById('kettleNo').value;
     const resinTypeSelect = document.getElementById('resinType');
-    const currentResin = resinTypeSelect.value;
+    const graphTitleInput = document.getElementById('graphTitle');
     
-    // Only suggest changes, don't force them
-    if (kettleNo === '1' && currentResin !== 'PF') {
-        // If user selects Kettle 1, suggest PF
-        console.log("Kettle 1 is typically used for PF resin");
-        // Optional: You could show a tooltip or hint here
-    } else if (kettleNo === '3' && !['UF', 'MF', 'UMF'].includes(currentResin)) {
-        // If user selects Kettle 3, suggest UF/MF/UMF
-        console.log("Kettle 3 is typically used for UF, MF, or UMF resin");
-        // Optional: You could show a tooltip or hint here
+    if (kettleNo === '1') {
+        // Kettle 1 -> PF resin
+        resinTypeSelect.value = 'PF';
+        graphTitleInput.value = 'CPIL - 03 / PF';
+        
+        // Update Others input visibility
+        toggleOthersInput('resinOthers');
+    } else if (kettleNo === '3') {
+        // Kettle 3 -> Default to UF (you can change this to MF or UMF if preferred)
+        resinTypeSelect.value = 'UF';
+        graphTitleInput.value = 'CPIL - 03 / UF';
+        
+        // Update Others input visibility
+        toggleOthersInput('resinOthers');
     }
+    // Kettle 2 -> No automatic change (keep as is)
 }
+
 
 // Function to update the toggle state
 function updateLinkToggle() {
@@ -1336,9 +1349,9 @@ function updateLinkToggle() {
     // Visual feedback
     const label = toggle.nextElementSibling;
     if (isLinkingEnabled) {
-        label.innerHTML = '<span style="color:#10b981">✓</span> Link with Resin Type & Kettle No';
+        label.innerHTML = '<span style="color:#10b981">✓</span> Auto-link ON: Graph Title ↔ Resin Type ↔ Kettle No';
     } else {
-        label.innerHTML = '<span style="color:#ef4444">✗</span> Link with Resin Type & Kettle No';
+        label.innerHTML = '<span style="color:#ef4444">✗</span> Auto-link OFF';
     }
 }
 
